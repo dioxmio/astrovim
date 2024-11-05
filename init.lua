@@ -16,10 +16,14 @@ if not pcall(require, "lazy") then
 end
 
 vim.api.nvim_create_autocmd("VimEnter", {
-	callback = function()
-		vim.cmd("silent !<command>")
-	end,
+  callback = function()
+    vim.cmd "silent !<command>"
+    vim.cmd "silent command"
+    vim.cmd "set cmdheight=1"
+  end,
 })
 
 require "lazy_setup"
 require "polish"
+
+require("oil").setup()

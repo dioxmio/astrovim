@@ -28,7 +28,7 @@ return {
         },
       },
       disabled = { -- disable formatting capabilities for the listed language servers
-        "tsserver",
+        "ts_ls",
       },
       timeout_ms = 1000, -- default format timeout
       -- filter = function(client) -- fully override the default formatting function
@@ -42,7 +42,23 @@ return {
     -- customize language server configuration options passed to `lspconfig`
     ---@diagnostic disable: missing-fields
     config = {
-      -- clangd = { capabilities = { offsetEncoding = "utf-8" } },
+      ts_ls = {
+        cmd = {
+          "typescript-language-server",
+          "--stdio",
+        },
+        cmd_env = {
+          NODE_OPTIONS = "--max-old-space-size=10240", -- Set max memory to 8GB
+        },
+        settings = {
+          typescript = {
+            inlayHints = { enabled = false },
+            suggest = { completeFunctionCalls = false },
+            referencesCodeLens = { enabled = false },
+            implementationsCodeLens = { enabled = false },
+          },
+        },
+      }, -- clangd = { capabilities = { offsetEncoding = "utf-8" } },
     },
     -- customize how language servers are attached
     handlers = {
@@ -91,6 +107,13 @@ return {
             return client.supports_method "textDocument/semanticTokens/full" and vim.lsp.semantic_tokens ~= nil
           end,
         },
+        ["<leader>lH"] = {
+          function() vim.diagnostic.open_float() end,
+          desc = "Open diagnostic float",
+        },
+        ["<leader>f-"] = {
+          function() vim.cmd "Oil" end,
+        },
       },
     },
     -- A custom `on_attach` function to be run after the default `on_attach` function
@@ -98,6 +121,13 @@ return {
     on_attach = function(client, bufnr)
       -- this would disable semanticTokensProvider for all clients
       -- client.server_capabilities.semanticTokensProvider = nil
+      vim.diagnostic.config {
+        virtual_text = true,
+        signs = true,
+        underline = true,
+        update_in_insert = true,
+        severity_sort = true,
+      }
     end,
   },
 }
